@@ -1,0 +1,62 @@
+extends layout
+
+block content
+  div.container
+    h1 BCS PID Tuner
+
+    form(method="post", enctype="multipart/form-data")
+      div.form-group
+        label.control-label(for='bcs') BCS 4.0 Device:
+        input.form-control(type='url', id='bcs', name='bcs', data-name='bcs', placeholder='http://192.168.1.5/')
+        i.icon-ok.pull-right.checkmark
+
+    .outputs
+      .header.row
+        .col-md-1 Output
+        .col-md-1 Proportional
+        .col-md-1 Integral
+        .col-md-1 Derivative
+        .col-md-1 Max Integral
+        .col-md-1 Min Integral
+        .col-md-1 Sample Period
+        .col-md-1 Output Period
+        .col-md-1 Min Pulse %
+        .col-md-1 Max Pulse %
+        .col-md-1 Tuning
+      .list
+        each val in [0, 1, 2, 3, 4, 5]
+          form(data-output=val)
+            .row.form-group
+              .col-md-1
+                p(data-name='output')
+              .col-md-1
+                input.form-control(type='number', data-name='proportional_gain')
+              .col-md-1
+                input.form-control(type='number', data-name='integral_gain')
+              .col-md-1
+                input.form-control(type='number', data-name='derivative_gain')
+              .col-md-1
+                input.form-control(type='number', data-name='integral_max')
+              .col-md-1
+                input.form-control(type='number', data-name='integral_min')
+              .col-md-1
+                input.form-control(type='number', data-name='sample_period')
+              .col-md-1
+                input.form-control(type='number', data-name='output_period')
+              .col-md-1
+                input.form-control(type='number', data-name='pulse_width_min')
+              .col-md-1
+                input.form-control(type='number', data-name='pulse_width_max')
+              .col-md-1
+                input(type='checkbox', data-name='tuning')
+          
+    .tuning
+      .header.row
+        .col-md-2 Error
+        .col-md-2 pTerm
+        .col-md-2 iTerm
+        .col-md-2 dTerm
+        .col-md-2 Output
+      .list
+        
+      script(src='js/index.js')
