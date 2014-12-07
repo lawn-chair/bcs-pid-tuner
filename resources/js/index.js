@@ -51,8 +51,8 @@ $( document ).ready( function () {
           $('#bcs').parent().addClass('has-success');
 
           bcs.helpers.getOutputs().then(displayOutputs);
-        });
-        bcs.on('notReady', function () {
+        })
+        .on('notReady', function () {
           $('#bcs').parent.addClass('has-error');
           bcs = null;
         });
