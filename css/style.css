@@ -1,15 +1,1 @@
-body{font:14px "Lucida Grande",Helvetica,Arial,sans-serif}
-a{color:#00b7ff}
-i.checkmark{margin-top:-1.3em;font-size:1.5em;margin-right:.2em}
-div.has-success i{color:#008000}
-div.has-error i{color:#f00}
-.row{height:1.8em}
-.header{height:2.5em;}
-.header div{text-decoration:underline;font-weight:bold}
-.tuning{margin-top:45px;margin-left:-15px;padding-right:30px;border:1px solid #000;width:50%;}
-.tuning .row{margin-left:0;text-align:center;padding-right:10px}
-.tuning .list{overflow-y:scroll;overflow-x:hidden;height:300px}
-.tuning .col-md-2{width:20%}
-input.form-control{padding-right:6px}
-.col-md-1{padding-left:0}
-.heading{position:relative;top:-1.8em;left:0;text-decoration:underline;font-weight:bold}
+body{font:14px "Lucida Grande",Helvetica,Arial,sans-serif}a{color:#00b7ff}i.checkmark{margin-top:-1.3em;font-size:1.5em;margin-right:.2em}div.has-success i{color:#008000}div.has-error i{color:#f00}.row{height:1.8em}.header{height:2.5em;}.header div{text-decoration:underline;font-weight:bold}.tuning{margin-top:45px;margin-left:-15px;padding-right:30px;border:1px solid #000;width:50%;}.tuning .row{margin-left:0;text-align:center;padding-right:10px}.tuning .list{overflow-y:scroll;overflow-x:hidden;height:300px}.tuning .col-md-2{width:20%}input.form-control{padding-right:6px}.col-md-1{padding-left:0}.heading{position:relative;top:-1.8em;left:0;text-decoration:underline;font-weight:bold}

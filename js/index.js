@@ -1,1 +1,105 @@
-/*! bcs-pid-tuner - v0.0.1 - 2014-12-07 */!function(){function a(a){$(".tuning .list").prepend($('<div class="row">').append([$('<div class="col-md-2">').html(a.tuning_values.error),$('<div class="col-md-2">').html(a.tuning_values.pTerm),$('<div class="col-md-2">').html(a.tuning_values.iTerm),$('<div class="col-md-2">').html(a.tuning_values.dTerm),$('<div class="col-md-2">').html(a.tuning_values.output)]))}function b(b){clearInterval(d),b.forEach(function(b,e){c.read("pid/"+e).then(function(f){var g=$(".outputs .list [data-output="+e+"] .form-group");g.find('[data-name="output"]').html(b.name);for(var h in f)"tuning"===h?g.find("[data-name=tuning]")[0].checked=f.tuning:g.find('[data-name="'+h+'"]').val(f[h]);f.tuning&&(a(f),d=setInterval(function(){c.read("pid/"+e).then(a)},1e3))})})}var c,d=null;$(document).ready(function(){$("#bcs").on("change",function(a){$("#bcs").parent().removeClass("has-success").removeClass("has-error"),c=new BCS.Device(a.target.value),c.on("ready",function(){localStorage["bcs-backup.url"]=a.target.value,$("#bcs").parent().addClass("has-success"),c.helpers.getOutputs().then(b)}).on("notReady",function(){$("#bcs").parent.addClass("has-error"),c=null})}),localStorage["bcs-backup.url"]&&($("[data-name=bcs]").val(localStorage["bcs-backup.url"]),$("[data-name=bcs]").change()),$("input[data-name]").on("change",function(a){if(c&&c.ready){var d=$(a.target),e={};e[d.attr("data-name")]="checkbox"===d.attr("type")?d[0].checked:Number(d.val()),c.write("pid/"+d.parents("form").attr("data-output"),e).then(function(){c.helpers.getOutputs().then(b)}),console.log(a.target)}})})}();
+/*global BCS */
+(function () {
+var bcs;
+var interval = null;
+
+function updateTuningLog(pid) {
+  $('.tuning .list').prepend($('<div class="row">').append([
+    $('<div class="col-md-2">').html(pid['tuning_values'].error),
+    $('<div class="col-md-2">').html(pid['tuning_values'].pTerm),
+    $('<div class="col-md-2">').html(pid['tuning_values'].iTerm),
+    $('<div class="col-md-2">').html(pid['tuning_values'].dTerm),
+    $('<div class="col-md-2">').html(pid['tuning_values'].output)
+  ]));
+}
+
+function displayOutputs(outputs) {
+  clearInterval(interval);
+  outputs.forEach(function (output, i) {
+    bcs.read('pid/' + i).then(function (pid) {
+      var group = $('.outputs .list [data-output=' + i + '] .form-group');
+      group.find('[data-name="output"]').html(output.name);
+
+      for(var property in pid) {
+        if(property === 'tuning') {
+          group.find('[data-name=tuning]')[0].checked = pid.tuning;
+        } else {
+          group.find('[data-name="' + property + '"]').val(pid[property]);
+        }
+      }
+
+      if(pid.tuning) {
+        updateTuningLog(pid);
+        interval = setInterval(function () { 
+          bcs.read('pid/' + i).then(updateTuningLog);
+        }, 1000);
+      }
+    });
+  });
+}
+
+$( document ).ready( function () {
+
+    /*
+        When a BCS url is entered, verify that it is running 4.0
+    */
+    $('#bcs').on('change', function (event) {
+        $('#bcs').parent().removeClass('has-success').removeClass('has-error');
+
+        if($(event.target.parentElement).find('.credentials [data-name=password]')[0]) {
+          bcs = new BCS.Device(event.target.value, {
+            auth: {
+              username: 'admin',
+              password: $(event.target.parentElement).find('.credentials [data-name=password]')[0].value
+            }});
+        } else {
+          bcs = new BCS.Device(event.target.value);
+        }
+
+        bcs.on('ready', function () {
+          localStorage['bcs-backup.url'] = event.target.value;
+          $('#bcs').parent().addClass('has-success');
+
+          bcs.helpers.getOutputs().then(displayOutputs);
+        })
+        .on('notReady', function (e) {
+          $('#bcs').parent().addClass('has-error');
+          if(e.cors && e.cors === 'rejected') {
+            $('.credentials').removeClass('hide');
+          }
+        });
+    });
+
+    $('[data-name=password]').on('change', function () {
+      $('[data-name=bcs]').change();
+    });
+
+    /*
+        Restore the URL on page load if we saved one in localStorage
+    */
+    if(localStorage['bcs-backup.url'])
+    {
+        $('[data-name=bcs]').val(localStorage['bcs-backup.url']);
+        $('[data-name=bcs]').change();
+    }
+
+    $('input[data-name]').on('change', function (event) {
+      if(bcs && bcs.ready) {
+        var element = $(event.target);
+        var data = {};
+        if(element.attr('type') === 'checkbox') {
+          data[element.attr('data-name')] = element[0].checked;
+        } else {
+          data[element.attr('data-name')] = Number(element.val());
+        }
+        bcs.write('pid/' + element.parents('form').attr('data-output'), data).then(function () {
+          bcs.helpers.getOutputs().then(displayOutputs);
+        });
+        console.log(event.target);
+      }
+    });
+    
+});
+
+    
+})();
