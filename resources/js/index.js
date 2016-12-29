@@ -27,7 +27,7 @@ function displayOutputs(outputs) {
           group.find('[data-name="' + property + '"]').val(pid[property]);
         }
       }
-      
+
       if(pid.tuning) {
         updateTuningLog(pid);
         interval = setInterval(function () { 
@@ -45,19 +45,35 @@ $( document ).ready( function () {
     */
     $('#bcs').on('change', function (event) {
         $('#bcs').parent().removeClass('has-success').removeClass('has-error');
-        bcs = new BCS.Device(event.target.value);
+
+        if($(event.target.parentElement).find('.credentials [data-name=password]')[0]) {
+          bcs = new BCS.Device(event.target.value, {
+            auth: {
+              username: 'admin',
+              password: $(event.target.parentElement).find('.credentials [data-name=password]')[0].value
+            }});
+        } else {
+          bcs = new BCS.Device(event.target.value);
+        }
+
         bcs.on('ready', function () {
           localStorage['bcs-backup.url'] = event.target.value;
           $('#bcs').parent().addClass('has-success');
 
           bcs.helpers.getOutputs().then(displayOutputs);
         })
-        .on('notReady', function () {
-          $('#bcs').parent.addClass('has-error');
-          bcs = null;
+        .on('notReady', function (e) {
+          $('#bcs').parent().addClass('has-error');
+          if(e.cors && e.cors === 'rejected') {
+            $('.credentials').removeClass('hide');
+          }
         });
     });
-    
+
+    $('[data-name=password]').on('change', function () {
+      $('[data-name=bcs]').change();
+    });
+
     /*
         Restore the URL on page load if we saved one in localStorage
     */
@@ -66,7 +82,7 @@ $( document ).ready( function () {
         $('[data-name=bcs]').val(localStorage['bcs-backup.url']);
         $('[data-name=bcs]').change();
     }
-    
+
     $('input[data-name]').on('change', function (event) {
       if(bcs && bcs.ready) {
         var element = $(event.target);
